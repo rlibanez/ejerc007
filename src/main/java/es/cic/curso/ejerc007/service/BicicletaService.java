@@ -21,6 +21,7 @@ public class BicicletaService {
         return bicicleta.getId();
     }
 
+    @PreAuthorize("hasRole('TRABAJADOR')")
     public Optional<Bicicleta> leer(long id) {
         return bicicletaRepository.findById(id);
     }

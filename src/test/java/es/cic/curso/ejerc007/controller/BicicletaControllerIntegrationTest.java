@@ -36,7 +36,21 @@ public class BicicletaControllerIntegrationTest {
     }
 
     @Test
-    void testRolAnnadirVenta() throws Exception {
+    void testRolAnnadirVenta_RolCorrecto() throws Exception {
+        // Arrange
+        Bicicleta bicicleta = new Bicicleta();
+        bicicleta.setMarca("Marca");
+        bicicleta.setModelo("Modelo");
+
+        // Act & Assert
+        mockMvc.perform(post("/api/bicicleta")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"marca\":\"Marca\",\"modelo\":\"Modelo\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testAnnadirVenta_RolIncorrecto() throws Exception {
         // Arrange
         Bicicleta bicicleta = new Bicicleta();
         bicicleta.setMarca("Marca");
