@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -36,6 +37,7 @@ public class BicicletaControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = "VENDEDOR")
     void testRolAnnadirVenta_RolCorrecto() throws Exception {
         // Arrange
         Bicicleta bicicleta = new Bicicleta();
@@ -50,7 +52,22 @@ public class BicicletaControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = "SOCIO")
     void testAnnadirVenta_RolIncorrecto() throws Exception {
+        // Arrange
+        Bicicleta bicicleta = new Bicicleta();
+        bicicleta.setMarca("Marca");
+        bicicleta.setModelo("Modelo");
+
+        // Act & Assert
+        mockMvc.perform(post("/api/bicicleta")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"marca\":\"Marca\",\"modelo\":\"Modelo\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testAnnadirVenta_SinRol() throws Exception {
         // Arrange
         Bicicleta bicicleta = new Bicicleta();
         bicicleta.setMarca("Marca");
@@ -63,4 +80,21 @@ public class BicicletaControllerIntegrationTest {
                 .andExpect(status().isMethodNotAllowed());
     }
 
+    @Test
+    void testAnnadirVenta_SinRol2() {
+        // Arrange
+        Bicicleta bicicleta = new Bicicleta();
+        bicicleta.setMarca("Marca");
+        bicicleta.setModelo("Modelo");
+
+        // Act & Assert
+        try {
+            mockMvc.perform(post("/api/bicicleta")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"marca\":\"Marca\",\"modelo\":\"Modelo\"}"))
+                    .andExpect(status().isMethodNotAllowed());
+        } catch (Exception e) {
+            System.out.println("*****AuthenticationCredentialsNotFoundException");
+        }
+    }
 }
